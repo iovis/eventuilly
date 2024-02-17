@@ -39,5 +39,44 @@ default:
   fputs("wat.", stderr)
 }
 
-let calendars = store.calendars(for: .event)
-print(calendars)
+var calendars = store.calendars(for: .event)
+// calendars = calendars.filter { ["Personal"].contains($0.title) }
+
+let now = Date()
+let ten_minutes_ago = Calendar.current.date(byAdding: .minute, value: -10, to: now)!
+let ten_minutes_from_now = Calendar.current.date(byAdding: .minute, value: 10, to: now)!
+
+// print(ten_minutes_ago)
+// print(now)
+// print(ten_minutes_from_now)
+
+let predicate_current_events = store.predicateForEvents(
+  withStart: ten_minutes_from_now,
+  end: ten_minutes_from_now,
+  calendars: calendars
+)
+
+let current_events = store.events(matching: predicate_current_events).filter { event in
+  return !event.isAllDay
+}
+if current_events.isEmpty {
+  print("no events")
+  exit(0)
+}
+
+let dateComponentsFormatter = DateComponentsFormatter()
+dateComponentsFormatter.allowedUnits = [.second, .minute, .hour]
+dateComponentsFormatter.maximumUnitCount = 1
+dateComponentsFormatter.unitsStyle = .full
+
+let timeFormatter = DateFormatter()
+timeFormatter.dateFormat = "HH:mm"
+
+for event in current_events {
+  // let time_passed = dateComponentsFormatter.string(from: event.startDate, to: now)!
+  // print("Event: \(event.title!) (\(time_passed))")
+
+  let start = timeFormatter.string(from: event.startDate)
+  let end = timeFormatter.string(from: event.endDate)
+  print("[\(start) - \(end)] \(event.title!)")
+}
