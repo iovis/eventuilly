@@ -5,6 +5,9 @@ import PackageDescription
 
 let package = Package(
   name: "eventuilly",
+  platforms: [
+    .macOS(.v14)
+  ],
   dependencies: [
     .package(url: "https://github.com/jdhealy/PrettyColors", from: "5.0.2")
   ],
